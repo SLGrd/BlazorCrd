@@ -1,0 +1,7 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="/" Path="D:\Tutorials\BlazorCrud\BlaApiCrd\BlaApiCrd\obj\Debug\net5.0\scopedcss\bundle\" />
+  <ContentRoot BasePath="/Identity" Path="C:\Users\sylvi\.nuget\packages\microsoft.aspnetcore.identity.ui\5.0.1\staticwebassets\V4\" />
+  <ContentRoot BasePath="_content/BlaAppCrd" Path="D:\Tutorials\BlazorCrud\BlaAppCrdSln\BlaAppCrd\obj\Debug\net5.0\scopedcss\projectbundle\" />
+  <ContentRoot BasePath="_content/BlaAppCrd" Path="D:\Tutorials\BlazorCrud\BlaAppCrdSln\BlaAppCrd\wwwroot\" />
+  <ContentRoot BasePath="_content/Syncfusion.Blazor" Path="C:\Users\sylvi\.nuget\packages\syncfusion.blazor\18.3.0.44\build\..\staticwebassets\" />
+</StaticWebAssets>

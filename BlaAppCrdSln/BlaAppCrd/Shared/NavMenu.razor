@@ -1,0 +1,104 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">BlaAppCrd</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            </NavLink>
+        </li>
+
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="#" @onclick="ToggleSubMenu">
+                <span class="oi oi-@Sign" aria-hidden="true"></span> Amigos
+            </NavLink>
+        </li>
+
+        @if (Visible)
+        {
+            <!-- https://docs.microsoft.com/en-us/aspnet/core/blazor/security/?view=aspnetcore-5.0 -->
+            <AuthorizeView>
+                <Authorized >
+                    <li class="expand mx-3 p-2">
+                        <ul>
+                            <li class="expand-nav-item px-3">
+                                <NavLink class="nav-link" href="Consultar">
+                                    <span class="oi oi-list-rich" aria-hidden="true"></span> Consultar
+                                </NavLink>
+                            </li>
+                            <li class="expand-nav-item px-3">
+                                <NavLink class="nav-link" href="Incluir">
+                                    <span class="oi oi-expand-up" aria-hidden="true"></span> Incluir
+                                </NavLink>
+                            </li>
+                            <li class="expand-nav-item px-3">
+                                <NavLink class="nav-link" href="Alterar">
+                                    <span class="oi oi-ellipses" aria-hidden="true"></span> Alterar
+                                </NavLink>
+                            </li>
+                            <li class="expand-nav-item px-3">
+                                <NavLink class="nav-link" href="Deletar/28">
+                                    <span class="oi oi-trash" aria-hidden="true"></span> Deletar
+                                </NavLink>
+                            </li>
+                        </ul>
+                    </li>
+                </Authorized>
+                <NotAuthorized>
+                    <h5 style="color:red;font-size:12px;text-align:center"> Area restrita aos usuarios logados</h5>
+                    <li class="expand mx-3 p-2">
+                        <ul>
+                            <li class="expand-nav-item px-3">
+                                <NavLink class="nav-link" href="Consultar">
+                                    <span class="oi oi-list-rich" aria-hidden="true"></span> Consultar
+                                </NavLink>
+                            </li>
+                        </ul>
+                    </li>
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+
+        <AuthorizeView>
+            <Authorized>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="CurrencyConverter">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Conversão de Moedas
+                    </NavLink>
+                </li>
+            </Authorized>
+            <NotAuthorized>
+
+            </NotAuthorized>
+        </AuthorizeView>
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool Visible = false;
+    private string Sign = "plus";
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void ToggleSubMenu()
+    {
+        Visible = !Visible;
+        Sign = Visible ? "minus" : "plus"; 
+    }
+}

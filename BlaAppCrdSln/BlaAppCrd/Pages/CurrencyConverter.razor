@@ -1,0 +1,191 @@
+﻿@page  "/CurrencyConverter"
+
+@using System.Net.Http;
+@using System.Net.Http.Headers;
+
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.SplitButtons;
+@using Syncfusion.Blazor.Inputs;
+
+@using CommonCrd.Models;
+@using static CommonCrd.Code.GLB;
+
+<div class="container-fluid d-flex flex-column align-items-center justify-content-center m-0 p-0 vh-100">
+    <!-- Main Title -->
+    <div class="row m-0 p-0">
+        <div class="col-12">
+            <h1> Conversão de Moedas </h1>
+        </div>
+    </div>
+    <!-- Messages to user -->
+    @if (@Msg.Length > 0)
+    {
+        <div class="row m-0 p-0">
+            <div class="col-12">
+                <h5> @Msg </h5>
+            </div>
+        </div>
+    }
+    <!-- Componentes -->
+    <div class="row">
+        <!-- Combobox, e text box -->
+        <div class="col-5 flex-column justify-content-center">
+            <SfComboBox TValue="string" TItem="Moeda"
+                        Placeholder="Select a Currency" AllowCustom="false" PopupHeight="auto" DataSource="@Moedas">
+                <ComboBoxFieldSettings Text="ExtMoeda" Value="SymMoeda" />
+                <ComboBoxEvents TValue="string" TItem="Moeda" ValueChange="OnChangeCmb1" />
+            </SfComboBox>
+
+            <div class="pt-4 pb-0" style="font-size:10px">Amount</div>
+            <SfNumericTextBox TValue="double?" Format="N2" @bind-Value="@Amt1" />
+        </div>
+        <!-- Action button -->
+        <div class="col-2 d-flex align-items-center justify-content-center">
+            <SfProgressButton CssClass="e-round e-small e-success" IconCss="e-btn-sb-icons e-play-icon" OnClick="EvaluateConversion">
+                <ProgressButtonSpinSettings Position="SpinPosition.Center" />
+            </SfProgressButton>
+        </div>
+        <!-- Combobox, e text box -->
+        <div class="col-5 flex-column justify-content-center">
+            <SfComboBox TValue="string" TItem="Moeda"
+                        Placeholder="Select a Currency" AllowCustom="false" PopupHeight="auto" DataSource="@Moedas">
+                <ComboBoxFieldSettings Text="ExtMoeda" Value="SymMoeda" />
+                <ComboBoxEvents TValue="string" TItem="Moeda" ValueChange="OnChangeCmb2" />
+            </SfComboBox>
+
+            <div class="pt-4 pb-0" style="font-size:10px">Amount</div>
+            <SfNumericTextBox TValue="double?" Format="N2" @bind-Value="@Amt2" />
+        </div>
+    </div>
+</div>
+
+<style>
+    #progress-button-control {
+        width: 100%;
+        margin: 8% 0;
+        text-align: center;
+    }
+    @@media only screen and (max-width: 500px) {
+        #progress-button-control {
+            margin-left: -11%;
+        }
+    }
+    .progress-button-section {
+        width: 80%;
+        margin: auto;
+    }
+    #progress-button-control .col-xs-12 {
+        margin: 18px 0;
+    }
+    #contract.e-progress-active .e-btn-content {
+        display: none;
+    }
+    #contract {
+        transition: all .3s cubic-bezier(.175, .885, .32, 1) 100ms;
+    }
+    @@font-face {
+        font-family: 'button-icons';
+        src: url(data:application/x-font-ttf;charset=utf-8;base64,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) format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+    .e-btn-sb-icons {
+        font-family: 'button-icons';
+        line-height: 1;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    .e-play-icon::before {
+        content: '\e701';
+        font-size: 12px;
+    }
+    .e-bigger .e-play-icon::before {
+        font-size: 14px;
+    }
+    .e-download-icon::before {
+        content: '\e702';
+    }
+    .e-round .e-play-icon {
+        margin-top: -2px;
+    }
+    .bootstrap4 .e-round .e-play-icon {
+        margin-top: 0;
+        margin-left: 2px;
+    }
+    .material .e-round .e-play-icon {
+        margin-top: 0;
+    }
+</style>
+
+@code {
+    public string ValueCmb1 { get; set; } = string.Empty;
+    public string ValueCmb2 { get; set; } = string.Empty;
+
+    public double? Amt1 { get; set; } = 100.0;
+    public double? Amt2 { get; set; } = 100.0;
+
+    public string Msg { get; set; } = string.Empty;
+
+    List<Moeda> Moedas = new List<Moeda>()
+    {
+        new Moeda( "BRL", "Brazilian Real"),
+        new Moeda( "USD", "American Dollar"),
+        new Moeda( "CAD", "Canadian Dollar")
+    };
+
+    protected override void OnInitialized() { base.OnInitialized(); }
+
+    public void OnChangeCmb1( Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, Moeda> args) {
+        ValueCmb1 = args.ItemData?.SymMoeda;}
+
+    public void OnChangeCmb2( ChangeEventArgs<string, Moeda> args) { 
+        ValueCmb2 = args.ItemData?.SymMoeda;}
+
+    public async void EvaluateConversion()
+    {
+        if ( ValueCmb1.Equals(string.Empty)) { Msg = "Select currencies to convert "; return; }
+        if ( ValueCmb2.Equals(string.Empty)) { Msg = "Select currencies to convert "; return; }
+
+        //  Calls API and get conversion values
+        await GetConversion();
+        //  Forces screen refresh t display results
+        this.StateHasChanged();
+    }
+
+    protected async Task<double> GetConversion()
+    {
+        double ConversionRate = 0.0;
+        try
+        {
+            HttpClient h = new HttpClient();
+            //  Define o modo de recebimento dos dados (JSON) . Poderia ser XML por ex;
+            h.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue("application/json"));
+            //  Informa o endereço base (parte fixa) da API
+            h.BaseAddress = new Uri("https://free.currconv.com");   // ou h.BaseAddress = new Uri("https://free.currencyconverterapi.com");
+
+            string CurrencyPair = ValueCmb1 + "_" + ValueCmb2;
+            string Argument = "api/v7/convert?q=" + CurrencyPair + @"&compact=ultra&" + apiKey ;
+
+            Msg = "getting quotes ...";
+            //  Envia o request (getasync) com o URI universal resource identifier
+            using (HttpResponseMessage m = await h.GetAsync( Argument))
+            {
+                if (m.IsSuccessStatusCode)
+                {
+                    var dados = await m.Content.ReadAsStringAsync();
+                    ConversionRate = (double)Newtonsoft.Json.Linq.JObject.Parse(dados)[CurrencyPair];
+                    Amt2 = Amt1 * ConversionRate;
+                    Msg = "";
+                }
+                else
+                {   Msg = "Erro : " + m.ReasonPhrase ; }
+            }
+        }   catch (Exception ex) { Msg = ex.Message; }
+
+        return ConversionRate;
+    }
+}

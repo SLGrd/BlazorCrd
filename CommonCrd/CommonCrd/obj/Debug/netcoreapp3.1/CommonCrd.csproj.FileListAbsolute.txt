@@ -1,0 +1,8 @@
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\bin\Debug\netcoreapp3.1\CommonCrd.deps.json
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\bin\Debug\netcoreapp3.1\CommonCrd.dll
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\bin\Debug\netcoreapp3.1\CommonCrd.pdb
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\obj\Debug\netcoreapp3.1\CommonCrd.AssemblyInfoInputs.cache
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\obj\Debug\netcoreapp3.1\CommonCrd.AssemblyInfo.cs
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\obj\Debug\netcoreapp3.1\CommonCrd.csproj.CoreCompileInputs.cache
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\obj\Debug\netcoreapp3.1\CommonCrd.dll
+D:\Tutorials\BlazorCrud\CommonCrd\CommonCrd\obj\Debug\netcoreapp3.1\CommonCrd.pdb

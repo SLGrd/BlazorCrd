@@ -1,0 +1,198 @@
+﻿@page "/Deletar/{Id}"
+
+@using System.Net.Http;
+@using System.Net.Http.Headers;
+@using CommonCrd.Models
+@using CommonCrd.DataServices;
+@using static CommonCrd.Code.GLB;
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+
+@inject NavigationManager  navigationManager
+
+<h3>Excluir Registro</h3>
+
+<div class="container-fluid m-0 p-0">
+    <div class="row vh-100 align-items-center">
+        @*// Centraliza na vertical  - Bootstrap 5.0 beta*@
+        <div class="col-12 d-flex justify-content-center">
+            @*// Centraliza na horizontal  - Bootstrap 5.0 beta*@
+            <EditForm Model="@Amg" readonly="readonly">                                   
+                <SfCard class="BordaRelevo p-4 m-0">
+                    <CardHeader>
+                        <h2 class="text-center mb-3" style="color:darkblue;font-size:22px">Amigo</h2>
+                    </CardHeader>                 
+                    <CardContent >
+                        <fieldset disabled="true">
+                            <div class="row" style="border-top:solid 1px">
+                                <div class="col-12 d-flex flex-column">
+                                    <label style="font-size:12px;margin-bottom:0;margin-top:22px">Nome</label>
+                                    <SfTextBox class="sfText" style="" CssClass="" Type="InputType.Text" @bind-value="@Amg.Nome"></SfTextBox>                                            
+                                </div>
+                                <div class="col-12 d-flex flex-column">
+                                    <label style="font-size:12px;margin-bottom:0;margin-top:6px;">Address</label>
+                                    <SfTextBox class="sfText" CssClass="" Placeholder="" Type="InputType.Text" @bind-Value=@Amg.Address></SfTextBox>                                            
+                                </div>
+                                <div class="col-12 d-flex flex-column">
+                                    <label style="font-size:12px;margin-bottom:0;margin-top:6px;">Email</label>
+                                    <SfTextBox class="sfText" CssClass="" Placeholder="" Type="InputType.Email" @bind-Value=@Amg.Email></SfTextBox>                                            
+                                </div>
+                                <div class="col-12 d-flex flex-column">
+                                    <label style="font-size:12px;margin-bottom:0;margin-top:6px;">Phone</label>
+                                    <SfTextBox class="sfText" CssClass="" Placeholder="" Type="InputType.Text" @bind-Value=@Amg.Phone></SfTextBox>                                            
+                                </div>
+                            </div>
+                        </fieldset>
+                    </CardContent>                     
+                    <CardFooter>
+                        <div class="row flex-column  mt-5 mb-2">
+                            @if (Msg.Length > 0)
+                            {<div class="col">
+                                    <p class="" style="color:darkblue;font-size:13px">@Msg</p>
+                                </div>
+                            }
+                            <div class="col mt-0">
+                                <SfButton class="btn-block btn" style="background-color:orangered" @onclick="@DeleteAmigo"> Confirm Delete </SfButton>
+                            </div>
+                            <div class="col mt-3">
+                                <SfButton class="btn-block btn" style="background-color:#ffff80;"  @onclick="@Cancel"> Cancel </SfButton>
+                            </div>
+                        </div>
+                    </CardFooter>
+                </SfCard>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+<style>
+    .BordaRelevo {
+        max-width: 400px;
+        padding: 34px;
+        background-color: gainsboro;
+        box-shadow: 5px 10px 18px #888888;
+        border-radius: 9px;
+        border-color: black;
+        border-style: double;
+    }
+    .sfText {
+        font-size: 18px;
+        width: 100%;
+        color: darkblue;
+        border-width: 0px 0px 2px 0px;
+        background-color: gainsboro;  
+    }
+    .btn {
+        border: solid 1px;
+        font-size: 18px;
+        border-radius: 5px;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    private int RowId = 0;
+
+    private AmigosMd Amg = new AmigosMd();
+
+    private string Msg = string.Empty;
+
+    protected async override void OnInitialized()
+    {
+        base.OnInitialized();
+        //  Checks for valid Id and get record if it is OK
+        if (!int.TryParse(Id, out RowId))
+            Msg = "Invalid record identification : " + Id;
+        else
+            await GetAmigoByIdAsync( RowId);
+    }
+
+    protected async Task<AmigosMd> GetAmigoById(int RowId)
+    {
+        try
+        {
+            HttpClient h = new HttpClient();
+
+            //  Define o modo de recebimento dos dados (JSON) . Poderia ser XML por ex;
+            h.DefaultRequestHeaders.Accept.Clear();
+            h.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //  Informa o endereço base (parte fixa) da API
+            h.BaseAddress = new Uri(BaseAddress);
+
+            //  Envia o request (getasync) com o URI universal resource identifier
+            using (HttpResponseMessage m = await h.GetAsync("api/amigo/GetById/" + RowId.ToString()))
+            {
+                if (m.IsSuccessStatusCode)
+                {
+                    //  Recebe a resposta com os dados requisitados e converte no Comics Model
+                    var dados = await m.Content.ReadAsStringAsync();
+                    Amg = Newtonsoft.Json.JsonConvert.DeserializeObject<AmigosMd>(dados);
+                    this.StateHasChanged();
+                }
+                else
+                {
+                    Msg = "Status " + $"{m.StatusCode}" + m.ReasonPhrase;
+                }
+            }
+        }
+        catch (Exception ex) { throw ex; }
+        return Amg;
+    }
+
+    protected async Task<AmigosMd> GetAmigoByIdAsync(int RowId)
+    {
+        try
+        {
+            HttpClient h = new HttpClient();
+
+            //  Define o modo de recebimento dos dados (JSON) . Poderia ser XML por ex;
+            h.DefaultRequestHeaders.Accept.Clear();
+            h.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //  Informa o endereço base (parte fixa) da API
+            h.BaseAddress = new Uri(BaseAddress);
+
+            //  Envia o request (getasync) com o URI universal resource identifier            
+            using (HttpResponseMessage m = await h.GetAsync("api/amigo/GetByIdAsync/" + RowId.ToString()))
+            {
+                if (m.IsSuccessStatusCode)
+                {
+                    //  Recebe a resposta com os dados requisitados e converte no Comics Model
+                    var dados = await m.Content.ReadAsStringAsync();
+                    Amg = Newtonsoft.Json.JsonConvert.DeserializeObject<AmigosMd>(dados);
+                    this.StateHasChanged();
+                }
+                else
+                {
+                    Msg = "Status " + $"{m.StatusCode} - " + m.ReasonPhrase;
+                    this.StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex) { throw ex; }
+        return Amg;
+    }
+
+    private void DeleteAmigo()
+    {
+        try
+        {
+            AmigosDal Am = new AmigosDal();
+            //CodeMsg cm = Am.DeletarAsync(RowId);
+            Am.DeletarAsync(RowId);
+            //  Gravou, limpa a tela
+            { Msg = ""; Amg = new AmigosMd(); }
+        }
+        catch (Exception ex)
+        {
+            Msg = "Erro de gravação : " + ex.Message;   //  Erro nao esperado. queda de internet, etc
+        }
+    }
+
+    private void Cancel()
+    {
+        //  Clear screeen
+        Msg = ""; Amg = new AmigosMd();
+    }
+}

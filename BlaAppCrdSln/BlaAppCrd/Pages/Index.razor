@@ -1,0 +1,108 @@
+﻿@page "/"
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@using Syncfusion.Blazor.Maps
+
+<AuthorizeView>
+    <Authorized>
+        <div class="container-fluid vh-100 p-0 m-0 d-flex align-items-center "
+             style="border: thin; border-width:1px; border-color:darkred;">
+            <h1>Hello, world!</h1>
+            <SfMaps>
+                <MapsLayers>
+                    <MapsLayer ShapeData='new {dataOptions= "https://cdn.syncfusion.com/maps/map-data/world-map.json"}'
+                               DataSource="Countries"
+                               ShapePropertyPath='@("name")'
+                               ShapeDataPath="Name">
+                        <MapsDataLabelSettings Visible="true" LabelPath="Rotulo"></MapsDataLabelSettings>
+                        <MapsShapeSettings Fill="#E5E5E5" ColorValuePath="Status">
+                            <MapsShapeColorMappings>
+                                <MapsShapeColorMapping Value="OK" Color="@("#EDB46F")"></MapsShapeColorMapping>
+                                <MapsShapeColorMapping Value="FF" Color="@("#F1931B")"></MapsShapeColorMapping>
+                                <MapsShapeColorMapping Value="FR" Color="@("#333399")"></MapsShapeColorMapping>
+                                <MapsShapeColorMapping Value="UN" Color="@("#993333")"></MapsShapeColorMapping>
+                            </MapsShapeColorMappings>
+                        </MapsShapeSettings>
+
+                    </MapsLayer>
+                </MapsLayers>
+            </SfMaps>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Hello, world!</h1>
+        <br /><br />
+        <h2>Welcome to your new app.</h2>
+        <h4>Faça seu registro/login para ter acesso a todas as funções da aplicação</h4>
+    </NotAuthorized>
+</AuthorizeView>
+
+<style>
+    .bgimg {
+        background-image: url('../images/download.jfif');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+</style>
+
+@code{
+    private string _authMessage;
+    private string _surnameMessage;
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+
+    private string LoggedUserName;
+
+    protected List<CountryDetails> Countries = new List<CountryDetails>{
+         new CountryDetails { Name= "Arizona",       Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "California",    Rotulo= "UN",  Status= "FR"},
+         new CountryDetails { Name= "France",        Rotulo= "CH",  Status= "FR"},
+         new CountryDetails { Name= "Russia",        Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "Brazil",        Rotulo= "BR",  Status= "FR"},
+         new CountryDetails { Name= "Kazakhstan",    Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "Poland",        Rotulo= "CH",  Status= "FF"},
+         new CountryDetails { Name= "Sweden",        Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "United Kingdom",Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "United States", Rotulo= "UN",  Status= "UN"},
+         new CountryDetails { Name= "Chile",         Rotulo= "CH",  Status= "FF"},
+         new CountryDetails { Name= "Eq. Guinea",    Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "Ethiopia",      Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "Côte d Ivoire", Rotulo= "CH",  Status= "OK"},
+         new CountryDetails { Name= "Kuwait",        Rotulo= "CH",  Status= "OK"},        
+         new CountryDetails { Name= "Peru",          Rotulo= "CH",  Status= "OK"}
+    };
+    public class CountryDetails
+    {
+        public string Name;
+        public string Rotulo;
+        public string Status;
+    };
+
+    protected async override void OnInitialized()
+    {
+        base.OnInitialized();
+        await GetClaimsPrincipalData();
+    }
+
+    private async Task GetClaimsPrincipalData()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            _authMessage = $"{user.Identity.Name} is authenticated.";
+            _claims = user.Claims;
+            _surnameMessage =
+                $"Surname: {user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value}";
+            LoggedUserName = user.Identity.Name;
+        }
+        else
+        {
+            _authMessage = "The user is NOT authenticated.";
+        }
+    }
+}

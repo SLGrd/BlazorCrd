@@ -1,0 +1,149 @@
+﻿@page "/Consultar"
+@attribute [Authorize]
+
+@using System.Collections.Generic;
+@using System.Net.Http;
+@using System.Net.Http.Headers;
+
+@using CommonCrd.Models
+@using Syncfusion.Blazor.Grids
+
+@inject NavigationManager  navigationManager
+
+<h3>Lista de Amigos (na verdade são os governadores gerais do Brasil colonia)</h3>
+@if (@Msg.Length > 0) { <h2> @Msg </h2> }
+
+<div id="container">
+    <SfGrid DataSource="@Amigos" GridLines="GridLine.Both" AllowPaging="true" EnableAltRow="true" RowHeight="38" EnableHover="false">
+        <GridEvents RowSelected="@RowSelectHandler" TValue="AmigosMd"></GridEvents>
+        <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Dialog"></GridEditSettings>
+        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+        <GridPageSettings PageCount="5" PageSizes="true"></GridPageSettings>
+
+        <GridColumns>
+            <GridColumn Field=@nameof(AmigosMd.Nome) HeaderText="Nome" Visible="true" Width="170"></GridColumn>
+            <GridColumn Field=@nameof(AmigosMd.Address) HeaderText="Address" Visible="true" Width="130"></GridColumn>
+            <GridColumn Field=@nameof(AmigosMd.Email) HeaderText="Email" Visible="true" Width="170"></GridColumn>
+            <GridColumn Field=@nameof(AmigosMd.Phone) HeaderText="Phone" Visible="true" Width="170"></GridColumn>
+            <GridColumn Field=@nameof(AmigosMd.RowId) HeaderText="RowId" Visible="true" Width="70" IsPrimaryKey="true"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <Incluir />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .e-grid {
+        background-color: white;
+        box-shadow: 5px 10px 18px #888888;
+        border-color: black;
+        border-style: solid;
+    }
+
+        .e-grid .e-gridheader .e-columnheader {
+            height: 50px;
+        }
+
+            .e-grid .e-gridheader .e-columnheader .e-headercell {
+                color: white;
+                background-color: darkblue;
+            }
+
+        .e-grid .e-headercelldiv {
+            font-weight: light;
+            font-size: 20px;
+        }
+
+    .e-gridcontent .e-rowcell {
+        font-weight: regular;
+        font-size: 16px;
+    }
+
+    .e-gridcontent .e-altrow {
+        background-color: lightsteelblue;
+    }
+
+    .e-pager {
+        color: white;
+        background-color: darkblue;
+    }
+
+        .e-pager .e-pagercontainer {
+            color: black;
+            background-color: white;
+        }
+
+    .e-gridfooter {
+        height: 90px;
+    }
+
+        .e-gridfooter .e-summaryrow {
+            color: white;
+        }
+</style>
+
+@code {
+    private List<AmigosMd> Amigos = new List<AmigosMd>();
+    private string Msg = string.Empty;
+
+    protected async override void OnInitialized()
+    {
+        base.OnInitialized();
+        await GetAllAmigosAsync();
+    }
+
+    protected async Task<List<AmigosMd>> GetAllAmigosAsync()
+    {
+        try
+        {
+            HttpClient h = new HttpClient();
+
+            //  Define o modo de recebimento dos dados (JSON) . Poderia ser XML por ex;
+            h.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //  Informa o endereço base (parte fixa) da API
+            h.BaseAddress = new Uri("http://localhost:52956"); // https://localhost:44301/
+
+            //  Envia o request (getasync) com o URI universal resource identifier
+            using (HttpResponseMessage m = await h.GetAsync("api/amigo/Gumbo"))
+            {
+                if (m.IsSuccessStatusCode)
+                {
+                    //  Recebe a resposta com os dados requisitados e converte no Amigos Model
+                    var dados = await m.Content.ReadAsStringAsync();
+                    Amigos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<AmigosMd>>(dados);
+                }
+                else
+                    Msg = "Status " + $"{m.StatusCode} - " + m.ReasonPhrase;
+                //  Screen refrexh
+                this.StateHasChanged();
+            }
+        }
+        catch (Exception ex) { throw ex; }
+
+        return Amigos;
+    }
+
+    public void RowSelectHandler(RowSelectEventArgs<AmigosMd> args)
+    {
+        AmigosMd amg = args.Data;
+        //  Navigates to data entry form
+        navigationManager.NavigateTo($"/Deletar/{amg.RowId}");
+    }
+}
