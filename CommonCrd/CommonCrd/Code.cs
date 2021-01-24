@@ -6,7 +6,7 @@
         {
             public static string CnnString;
             public static string BaseAddress = "http://localhost:52956";
-            public static string apiKey = @"apiKey=5c2cfa5a9fe6395d6ea0";
+            public static string apiKey = @"apiKey=6395d6ea0";
         }
     }
 
